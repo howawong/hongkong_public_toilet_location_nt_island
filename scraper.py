@@ -22,3 +22,32 @@
 # All that matters is that your final data is written to an SQLite database
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
+import scrapy
+from scrapy.crawler import CrawlerProcess
+import scraperwiki
+
+class ToiletSpider(scrapy.Spider):
+    name = "toilet"
+    def start_requests(self):
+        yield scrapy.Request('http://www.fehd.gov.hk/english/pleasant_environment/cleansing/list_of_public_toilets.php?district=NTIs')
+        yield scrapy.Request('http://www.fehd.gov.hk/english/pleasant_environment/cleansing/list_of_public_toilets.php?district=HK')
+        yield scrapy.Request('http://www.fehd.gov.hk/english/pleasant_environment/cleansing/list_of_public_toilets.php?district=KLN')
+
+    def parse(self, response):
+        tables = response.xpath("//table")
+        print len(tables)
+        for table in tables:
+            rows = table.xpath("tr")
+            district = rows[0].xpath("td/text()").extract()[0]
+            for row in rows[2:]:
+                texts = row.xpath("td/text()")
+                name = texts[1].extract().replace("*", "")
+                address = texts[2].extract()
+                print name, address
+                scraperwiki.sqlite.save(unique_keys=[], data={"district": district, "name": name, "address": address})
+process = CrawlerProcess()
+process.crawl(ToiletSpider)
+process.start()
+
+            
+
