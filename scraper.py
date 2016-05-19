@@ -44,6 +44,7 @@ class ToiletSpider(scrapy.Spider):
                 name = texts[1].extract().replace("*", "")
                 address = texts[2].extract()
                 scraperwiki.sqlite.save(unique_keys=[], data={"district": district, "name": name, "address": address})
+scraperwiki.sqlite.execute("DROP table data")
 process = CrawlerProcess()
 process.crawl(ToiletSpider)
 process.start()
