@@ -43,7 +43,6 @@ class ToiletSpider(scrapy.Spider):
                 texts = row.xpath("td/text()")
                 name = texts[1].extract().replace("*", "")
                 address = texts[2].extract()
-                print name, address
                 scraperwiki.sqlite.save(unique_keys=[], data={"district": district, "name": name, "address": address})
 process = CrawlerProcess()
 process.crawl(ToiletSpider)
